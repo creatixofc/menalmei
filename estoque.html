@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Controle de Estoque Menalmei</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button { padding: 5px; margin: 5px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f4f4f4; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+  </style>
+</head>
+<body>
+
+  <h2>Cadastro de Produtos</h2>
+
+  <label>Produto: <input type="text" id="nome"></label>
+  <label>Marca: <input type="text" id="marca"></label>
+  <label>Tamanho: <input type="text" id="tamanho"></label>
+  <label>Cor: <input type="text" id="cor"></label>
+  <label>Preço: <input type="number" id="preco" step="0.01"></label>
+  <label>Quantidade: <input type="number" id="quantidade"></label>
+  <button onclick="adicionarProduto()">Salvar</button>
+
+  <h2>Produtos Cadastrados</h2>
+  <div id="produtos">Carregando produtos...</div>
+
+  <script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfITzrTuLHicnaXv3Vuc-lByGCO6roA9-BzLFCZd8rmDOW9yoLD7OtvlJgzLl0MFU/exec";
+
+let produtos = []; // Array para guardar os dados carregados
+let editIndex = null; // Guarda o índice do produto que está sendo editado
+
+async function carregarProdutos() {
+  try {
+    const resposta = await fetch(SCRIPT_URL);
+    produtos = await resposta.json();
+
+    let html = "<table><tr><th>Data</th><th>Produto</th><th>Marca</th><th>Tamanho</th><th>Cor</th><th>Preço</th><th>Quantidade</th><th>Vendas</th><th>Ações</th></tr>";
+    produtos.forEach((linha, index) => {
+      html += `<tr>
+        <td>${linha.Data || '-'}</td>
+        <td>${linha.Produto || ''}</td>
+        <td>${linha.Marca || ''}</td>
+        <td>${linha.Tamanho || ''}</td>
+        <td>${linha.Cor || ''}</td>
+        <td>R$ ${linha.Preço || 0}</td>
+        <td>${linha.Quantidade || 0}</td>
+        <td>${linha.Vendas || 0}</td>
+        <td>
+          <button onclick="editarLinha(${index})">Editar</button>
+          <button onclick="excluirLinha(${index})">Excluir</button>
+        </td>
+      </tr>`;
+    });
+
+    html += "</table>";
+    document.getElementById("produtos").innerHTML = html;
+
+  } catch (erro) {
+    document.getElementById("produtos").innerHTML = "Erro ao carregar produtos 😕";
+    console.error(erro);
+  }
+}
+
+function editarLinha(index) {
+  const produto = produtos[index];
+  document.getElementById("nome").value = produto.Produto;
+  document.getElementById("marca").value = produto.Marca;
+  document.getElementById("tamanho").value = produto.Tamanho;
+  document.getElementById("cor").value = produto.Cor;
+  document.getElementById("preco").value = produto.Preço;
+  document.getElementById("quantidade").value = produto.Quantidade;
+  editIndex = index;
+}
+
+async function excluirLinha(index) {
+  if (!confirm("Deseja realmente excluir este produto?")) return;
+
+  try {
+    const resposta = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ acao: "excluir", index })
+    });
+    alert(await resposta.text());
+    carregarProdutos();
+  } catch (erro) {
+    alert("Erro ao excluir produto 😕");
+    console.error(erro);
+  }
+}
+
+async function adicionarProduto() {
+  const dados = {
+    produto: document.getElementById("nome").value,
+    marca: document.getElementById("marca").value,
+    tamanho: document.getElementById("tamanho").value,
+    cor: document.getElementById("cor").value,
+    preco: document.getElementById("preco").value,
+    quantidade: document.getElementById("quantidade").value,
+    acao: editIndex !== null ? "editar" : "adicionar",
+    index: editIndex
+  };
+
+  if (!dados.produto || !dados.preco || !dados.quantidade) {
+    alert("Preencha pelo menos: produto, preço e quantidade");
+    return;
+  }
+
+  try {
+    const resposta = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(dados)
+    });
+    alert(await resposta.text());
+
+    // Limpa o formulário e reseta edição
+    document.getElementById("nome").value = '';
+    document.getElementById("marca").value = '';
+    document.getElementById("tamanho").value = '';
+    document.getElementById("cor").value = '';
+    document.getElementById("preco").value = '';
+    document.getElementById("quantidade").value = '';
+    editIndex = null;
+
+    carregarProdutos();
+  } catch (erro) {
+    alert("Erro ao enviar dados 😕");
+    console.error(erro);
+  }
+}
+
+carregarProdutos();
+</script>
+
+
+</body>
+</html>

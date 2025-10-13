@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Menu Menalmei</title>
+  <link rel="icon" href="imagens/favicon.png" type="image/png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #eaeaea;
+      color: #000000;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    h1 { margin-top: 50px; color: #232938; }
+
+    .botao-menu {
+      display: block;
+      width: 200px;
+      padding: 15px;
+      margin: 20px auto;
+      background-color: #232938;
+      color: #eaeaea;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      text-decoration: none;
+    }
+
+    .botao-menu:hover { background-color: #000000; }
+
+    #logout {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 120px;
+      padding: 10px;
+      background-color: #232938;
+      color: #eaeaea;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    #logout:hover { background-color: #000000; }
+  </style>
+</head>
+<body>
+
+  <button id="logout" onclick="confirmarLogout()">Logout</button>
+
+  <h1>Menu Menalmei</h1>
+
+  <button class="botao-menu" onclick="window.location.href='vender.html'">Vender</button>
+  <button class="botao-menu" onclick="window.location.href='estoque.html'">Estoque</button>
+  <button class="botao-menu" onclick="window.location.href='historico.html'">Histórico de Vendas</button>
+
+  <script>
+    function confirmarLogout() {
+      if (confirm("Tem certeza que deseja sair da conta?")) {
+        localStorage.removeItem("usuarioLogado");
+        window.location.replace("login.html");
+      }
+    }
+  </script>
+
+</body>
+</html>
