@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendas Avançadas - Menalmei</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    background-color: #f0f0f0;
+  }
+
+  .main {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  h1 {
+    margin-top: 0;
+    color: #232938;
+  }
+
+  input#search {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .products-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .product-card {
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+    flex: 1 1 200px;
+    min-width: 200px;
+  }
+
+  .product-card:hover {
+    background-color: #eaeaea;
+  }
+
+  .cart {
+    width: 320px;
+    background-color: #232938;
+    color: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cart h2 {
+    margin-top: 0;
+    text-align: center;
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+    align-items: center;
+  }
+
+  .cart-item button {
+    background-color: red;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-left: 5px;
+  }
+
+  .cart-item .qty-buttons button {
+    background-color: #444;
+    margin: 0 2px;
+    padding: 2px 5px;
+  }
+
+  .total {
+    margin-top: auto;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: right;
+  }
+
+  .cart button#finalizar, .cart button#imprimir {
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #232938;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  @media(max-width: 900px) {
+    body {
+      flex-direction: column;
+    }
+    .cart {
+      width: 100%;
+      order: -1;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="main">
+  <h1>Vendas Avançadas - Menalmei</h1>
+  <input type="text" id="search" placeholder="Buscar produto...">
+  <div class="products-list" id="productsList"></div>
+</div>
+
+<div class="cart" id="cart">
+  <h2>Carrinho</h2>
+  <div id="cartItems"></div>
+  <div class="total" id="total">Total: R$ 0,00</div>
+  <button id="finalizar">Finalizar Pedido</button>
+  <button id="imprimir">Imprimir Recibo</button>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw7T0Kb57HTckB5U3oQZ5ofLQJEalHqUiJs0ErTyiQzGoAJ0XeGtKDIB_vnOCfmaGUR/exec?acao=produtos";
+  let produtos = [];
+  let carrinho = [];
+
+  async function carregarProdutos() {
+    try {
+      const response = await fetch(`${SCRIPT_URL}?tipo=produtos`);
+      const data = await response.json();
+      produtos = data;
+      exibirProdutos(produtos);
+    } catch(err) {
+      alert("Erro ao carregar produtos!");
+      console.error(err);
+    }
+  }
+
+  function exibirProdutos(lista) {
+    const container = document.getElementById("productsList");
+    container.innerHTML = "";
+    lista.forEach(p => {
+      const card = document.createElement("div");
+      card.classList.add("product-card");
+      card.innerHTML = `
+        <div><strong>${p.Produto}</strong></div>
+        <div>Marca: ${p.Marca}</div>
+        <div>Tamanho: ${p.Tamanho}</div>
+        <div>Cor: ${p.Cor}</div>
+        <div>Preco: R$ ${parseFloat(p.Preco).toFixed(2)}</div>
+      `;
+      card.onclick = () => adicionarCarrinho(p);
+      container.appendChild(card);
+    });
+  }
+
+  document.getElementById("search").addEventListener("input", e => {
+    const termo = e.target.value.toLowerCase();
+    const filtrados = produtos.filter(p => p.Produto.toLowerCase().includes(termo));
+    exibirProdutos(filtrados);
+  });
+
+  function adicionarCarrinho(produto) {
+    const existente = carrinho.find(i => i.ID === produto.ID);
+    if (existente) {
+      existente.quantidade++;
+    } else {
+      carrinho.push({ ...produto, quantidade: 1 });
+    }
+    atualizarCarrinho();
+  }
+
+  function atualizarCarrinho() {
+    const container = document.getElementById("cartItems");
+    container.innerHTML = "";
+    let total = 0;
+    carrinho.forEach(item => {
+      const div = document.createElement("div");
+      div.classList.add("cart-item");
+      div.innerHTML = `
+        <div>
+          ${item.Produto} 
+          <div class="qty-buttons">
+            <button onclick="alterarQuantidade('${item.ID}', -1)">-</button>
+            ${item.quantidade}
+            <button onclick="alterarQuantidade('${item.ID}', 1)">+</button>
+          </div>
+        </div>
+        <div>R$ ${(item.Preco * item.quantidade).toFixed(2)} 
+          <button onclick="removerItem('${item.ID}')">X</button>
+        </div>
+      `;
+      total += item.Preco * item.quantidade;
+      container.appendChild(div);
+    });
+    document.getElementById("total").innerText = `Total: R$ ${total.toFixed(2)}`;
+  }
+
+  function alterarQuantidade(id, delta) {
+    const item = carrinho.find(i => i.ID === id);
+    if (!item) return;
+    item.quantidade += delta;
+    if (item.quantidade <= 0) removerItem(id);
+    atualizarCarrinho();
+  }
+
+  function removerItem(id) {
+    carrinho = carrinho.filter(i => i.ID !== id);
+    atualizarCarrinho();
+  }
+
+  document.getElementById("finalizar").addEventListener("click", async () => {
+    if(carrinho.length === 0) {
+      alert("O carrinho está vazio!");
+      return;
+    }
+
+    for (const item of carrinho) {
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbw7T0Kb57HTckB5U3oQZ5ofLQJEalHqUiJs0ErTyiQzGoAJ0XeGtKDIB_vnOCfmaGUR/exec", {
+          method: "POST",
+          body: JSON.stringify({
+            acao: "venda",
+            ID: item.ID,
+            quantidade: item.quantidade
+          })
+        });
+      } catch(err) {
+        console.error("Erro ao atualizar planilha:", err);
+      }
+    }
+
+    alert("Pedido finalizado com sucesso!");
+    carrinho = [];
+    atualizarCarrinho();
+  });
+
+  document.getElementById("imprimir").addEventListener("click", () => {
+    if(carrinho.length === 0) {
+      alert("Carrinho vazio!");
+      return;
+    }
+    let recibo = "Recibo Menalmei\n\n";
+    carrinho.forEach(item => {
+      recibo += `${item.Produto} x ${item.quantidade} - R$ ${(item.Preco * item.quantidade).toFixed(2)}\n`;
+    });
+    recibo += `\nTotal: ${document.getElementById("total").innerText.split(': ')[1]}`;
+    const printWindow = window.open('', '', 'height=400,width=600');
+    printWindow.document.write('<pre>' + recibo + '</pre>');
+    printWindow.print();
+    printWindow.close();
+  });
+
+  carregarProdutos();
+</script>
+</body>
+</html>

@@ -2,167 +2,174 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Login Menalmei</title>
-
-  <link rel="icon" href="Imagens/favicon.png" type="image/png">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Sistema</title>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
-      margin-top: 30px; 
-      background-color: #eaeaea; 
-      color: #000000;
+    * {
+      box-sizing: border-box;
     }
 
-    img#logo {
-      width: 220px;  
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eaeaea;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+
+    .login-box {
+      background-color: #232938;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .logo {
+      width: 140px;
+      height: auto;
       margin-bottom: 10px;
     }
 
-    input, button { 
-      padding: 10px; 
-      margin: 5px; 
-      width: 220px; 
-      border-radius: 6px;
-      border: 1px solid #232938;
-      font-size: 14px;
+    h2 {
+      margin-bottom: 20px;
+      font-size: 1.5em;
+      color: #fff;
     }
 
-    input:focus {
-      outline: none;
-      border-color: #232938;
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
     }
 
     button {
-      background-color: #232938;
-      color: #eaeaea;
+      width: 100%;
+      padding: 12px;
+      background-color: #fff;
+      color: #232938;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
-      font-weight: bold;
+      font-size: 1em;
+      transition: background-color 0.3s;
     }
 
-    button:hover { background-color: #000000; }
+    button:hover {
+      background-color: #ccc;
+    }
 
-    #barraContainer {
+    /* Tela de carregamento */
+    #loadingScreen {
       display: none;
-      width: 220px;
-      height: 25px;
-      border: 1px solid #232938;
-      margin: 20px auto 5px auto;
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-      background-color: #eaeaea;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
     }
 
-    #barraProgresso {
-      height: 100%;
-      width: 0%;
-      background-color: #232938;
-      transition: width 0.1s linear;
+    #loadingLogo {
+      width: 200px;
+      height: auto;
+      margin-bottom: 10px;
     }
 
-    #percentual {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      height: 100%;
-      line-height: 25px;
-      font-weight: bold;
-      color: #eaeaea;
-      font-size: 14px;
-      pointer-events: none;
-    }
-
-    #textoEntrando {
-      display: none;
-      font-size: 14px;
+    #loadingText {
+      font-size: 1.2em;
       color: #232938;
       font-weight: bold;
-      margin-top: 5px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 480px) {
+      .login-box {
+        padding: 30px 20px;
+      }
+
+      .logo {
+        width: 120px;
+      }
+
+      h2 {
+        font-size: 1.3em;
+      }
+
+      input, button {
+        font-size: 0.95em;
+      }
+
+      #loadingLogo {
+        width: 100px;
+      }
+
+      #loadingText {
+        font-size: 1em;
+      }
     }
   </style>
 </head>
 <body>
-
-  <img src="imagens/logoretrato.png" alt="Logo">
-
-  <h2>Login Menalmei</h2>
-  <input type="text" id="login" placeholder="Login"><br>
-  <input type="password" id="senha" placeholder="Senha"><br>
-  <button onclick="fazerLogin()">Entrar</button>
-
-  <div id="barraContainer">
-    <div id="barraProgresso"></div>
-    <div id="percentual">0%</div>
+  <div class="container" id="loginContainer">
+    <div class="login-box">
+      <img src="Imagens/logoretratobranco.png" alt="Logo" class="logo">
+      <h2>Acessar Sistema</h2>
+      <input type="text" id="login" placeholder="Login">
+      <input type="password" id="senha" placeholder="Senha">
+      <button onclick="fazerLogin()">Entrar</button>
+    </div>
   </div>
-  <div id="textoEntrando">Entrando...</div>
+
+  <div id="loadingScreen">
+    <img id="loadingLogo" src="Imagens/logoretrato.png" alt="Logo">
+    <div id="loadingText">Entrando...</div>
+  </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw7T0Kb57HTckB5U3oQZ5ofLQJEalHqUiJs0ErTyiQzGoAJ0XeGtKDIB_vnOCfmaGUR/exec";
-
     async function fazerLogin() {
       const login = document.getElementById("login").value.trim();
       const senha = document.getElementById("senha").value.trim();
-      const barraContainer = document.getElementById("barraContainer");
-      const barraProgresso = document.getElementById("barraProgresso");
-      const percentual = document.getElementById("percentual");
-      const textoEntrando = document.getElementById("textoEntrando");
 
-      if(!login || !senha) {
-        alert("Preencha login e senha!");
+      if (!login || !senha) {
+        alert("Por favor, preencha todos os campos!");
         return;
       }
 
-      barraContainer.style.display = "block";
-      textoEntrando.style.display = "block";
-      barraProgresso.style.width = "0%";
-      percentual.innerText = "0%";
-
-      let progresso = 0;
-      const interval = setInterval(() => {
-        if(progresso < 95) {
-          progresso += Math.random() * 3; 
-          if(progresso > 95) progresso = 95;
-          barraProgresso.style.width = progresso + "%";
-          percentual.innerText = Math.floor(progresso) + "%";
-        }
-      }, 100);
+      // Oculta a tela de login e mostra a tela de carregamento
+      document.getElementById("loginContainer").style.display = "none";
+      const loadingScreen = document.getElementById("loadingScreen");
+      loadingScreen.style.display = "flex";
 
       try {
-        const resposta = await fetch(SCRIPT_URL);
-        const dados = await resposta.json();
+        const response = await fetch("https://script.google.com/macros/s/AKfycbw7T0Kb57HTckB5U3oQZ5ofLQJEalHqUiJs0ErTyiQzGoAJ0XeGtKDIB_vnOCfmaGUR/exec");
+        const data = await response.json();
+        const user = data.find(u => u.Login === login && u.Senha === senha);
 
-        clearInterval(interval);
-        barraProgresso.style.width = "100%";
-        percentual.innerText = "100%";
-
-        const usuarioValido = dados.find(user => user.Login === login && user.Senha === senha);
-
-        setTimeout(() => {
-          if(usuarioValido) {
-            localStorage.setItem("usuarioLogado", usuarioValido.Login);
-            window.location.replace("menu.html");
-          } else {
-            alert("Login ou senha incorretos!");
-            barraContainer.style.display = "none";
-            textoEntrando.style.display = "none";
-          }
-        }, 300);
-      } catch(err) {
-        clearInterval(interval);
-        barraContainer.style.display = "none";
-        textoEntrando.style.display = "none";
-        alert("Erro ao tentar logar 😕");
-        console.error(err);
+        if (user) {
+          window.location.href = "menu.html";
+        } else {
+          alert("Usuário ou senha incorretos!");
+          loadingScreen.style.display = "none";
+          document.getElementById("loginContainer").style.display = "block";
+        }
+      } catch (error) {
+        alert("Erro ao conectar com o servidor!");
+        loadingScreen.style.display = "none";
+        document.getElementById("loginContainer").style.display = "block";
       }
     }
   </script>
-
 </body>
 </html>
-
-
-
