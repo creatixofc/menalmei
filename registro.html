@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Surreal - Últimas Vendas</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1a1f38;
+    color: #fff;
+  }
+
+  .header {
+    background-color: #232938;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .header h1 {
+    margin: 0;
+    color: #ffdd59;
+  }
+
+  .container {
+    padding: 20px;
+  }
+
+  .total-vendas {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #ffdd59;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background-color: #232938;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: 0.3s;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  }
+
+  .card h2 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    color: #ffdd59;
+  }
+
+  .card p {
+    margin: 5px 0;
+    font-size: 16px;
+  }
+
+  .card p span {
+    font-weight: bold;
+  }
+
+  @media(max-width: 600px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Painel Surreal - Últimas Vendas</h1>
+</div>
+
+<div class="container">
+  <div class="total-vendas" id="totalVendas">Total de Vendas Hoje: R$ 0,00</div>
+  <div class="grid" id="produtosVendidos"></div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9x-lQXHX_xB6Uhf2BevWA4zHsFOB_hubb5o9LBoV_ExfXe_A094a80usTMwWUVpdZ/exec?tipo=registro";
+
+async function carregarVendas() {
+  try {
+    const response = await fetch(SCRIPT_URL);
+    const data = await response.json();
+    calcularTotal(data);
+    exibirVendas(data);
+  } catch(err) {
+    console.error("Erro ao carregar vendas:", err);
+    alert("Erro ao carregar vendas!");
+  }
+}
+
+function exibirVendas(vendas) {
+  const container = document.getElementById("produtosVendidos");
+  container.innerHTML = "";
+
+  vendas.reverse().forEach(venda => { 
+    const card = document.createElement("div");
+    card.classList.add("card");
+    card.innerHTML = `
+      <h2>${venda.Descricao}</h2>
+      <p><span>Quantidade:</span> ${venda.Quantidade}</p>
+      <p><span>Valor:</span> R$ ${parseFloat(venda.Valor).toFixed(2)}</p>
+      <p><span>Data:</span> ${venda.Data}</p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function calcularTotal(vendas) {
+  const hoje = new Date().toLocaleDateString("pt-BR");
+  let total = 0;
+  vendas.forEach(venda => {
+    if(venda.Data.includes(hoje)) {
+      total += parseFloat(venda.Valor) * parseInt(venda.Quantidade);
+    }
+  });
+  document.getElementById("totalVendas").innerText = `Total de Vendas Hoje: R$ ${total.toFixed(2)}`;
+}
+
+carregarVendas();
+</script>
+
+</body>
+</html>

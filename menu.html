@@ -1,77 +1,108 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Menu Menalmei</title>
-  <link rel="icon" href="imagens/favicon.png" type="image/png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Administrativo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #eaeaea;
-      color: #000000;
+    * {
       margin: 0;
       padding: 0;
-      position: relative;
-      min-height: 100vh;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
     }
 
-    h1 { margin-top: 50px; color: #232938; }
+    body {
+      background-color: #0f172a;
+      color: #fff;
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
 
-    .botao-menu {
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 40px;
+      color: #38bdf8;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+    }
+
+    .menu-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 30px;
+      width: 80%;
+      max-width: 800px;
+    }
+
+    .menu-item {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border: 1px solid #1e40af;
+      border-radius: 16px;
+      padding: 30px 20px;
+      text-align: center;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.1);
+    }
+
+    .menu-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+      border-color: #38bdf8;
+    }
+
+    .menu-item i {
+      font-size: 2.5rem;
+      color: #38bdf8;
+      margin-bottom: 10px;
+    }
+
+    .menu-item span {
       display: block;
-      width: 200px;
-      padding: 15px;
-      margin: 20px auto;
-      background-color: #232938;
-      color: #eaeaea;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.2s;
-      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: 600;
     }
 
-    .botao-menu:hover { background-color: #000000; }
-
-    #logout {
+    footer {
       position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 120px;
-      padding: 10px;
-      background-color: #232938;
-      color: #eaeaea;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.2s;
+      bottom: 15px;
+      font-size: 0.9rem;
+      color: #94a3b8;
     }
-
-    #logout:hover { background-color: #000000; }
   </style>
 </head>
 <body>
+  <h1>Painel Administrativo</h1>
+  
+  <div class="menu-container">
+    <div class="menu-item" onclick="abrirPagina('vendas.html')">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span>Vendas</span>
+    </div>
 
-  <button id="logout" onclick="confirmarLogout()">Logout</button>
+    <div class="menu-item" onclick="abrirPagina('estoque.html')">
+      <i class="fa-solid fa-boxes-stacked"></i>
+      <span>Estoque</span>
+    </div>
 
-  <h1>Menu Menalmei</h1>
+    <div class="menu-item" onclick="abrirPagina('registro.html')">
+      <i class="fa-solid fa-chart-line"></i>
+      <span>Registro de Vendas</span>
+    </div>
+  </div>
 
-  <button class="botao-menu" onclick="window.location.href='vendas.html'">Vender</button>
-  <button class="botao-menu" onclick="window.location.href='estoque.html'">Estoque</button>
-  <button class="botao-menu" onclick="window.location.href='historico.html'">Histórico de Vendas</button>
+  <footer>© 2025 - Sistema Administrativo</footer>
 
   <script>
-    function confirmarLogout() {
-      if (confirm("Tem certeza que deseja sair da conta?")) {
-        localStorage.removeItem("usuarioLogado");
-        window.location.replace("login.html");
-      }
+    function abrirPagina(pagina) {
+      window.location.href = pagina;
     }
   </script>
-
 </body>
 </html>
