@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Lista de Presentes - Arthur & Estephani</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
+
+  body {
+    font-family: 'Quicksand', sans-serif;
+    background: #fff5f7;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    overflow-x: hidden;
+  }
+
+  header {
+    text-align: center;
+    padding: 40px 20px 20px 20px;
+    background: #ffebf0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    position: relative;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 36px;
+    color: #ff4081;
+  }
+
+  header p {
+    margin: 5px 0 0 0;
+    font-size: 18px;
+    color: #555;
+  }
+
+  /* Botão copiar QR abaixo do subtítulo */
+  #copyHeaderCode {
+    display: block;
+    margin: 15px auto 0 auto;
+    padding: 10px 20px; /* mais largo e alto */
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    background-color: #ff4081;
+    color: #fff;
+    transition: background 0.3s;
+  }
+
+  #copyHeaderCode:hover {
+    background-color: #e73370;
+  }
+
+  h2 {
+    text-align: center;
+    margin-top: 30px;
+    color: #ff4081;
+  }
+
+  #cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .card {
+    background: #fff;
+    padding: 20px;
+    width: 280px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+    position: relative;
+    text-align: center;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+  }
+
+  .card img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .card h3 {
+    margin-top: 0;
+    color: #ff4081;
+  }
+
+  .card p {
+    margin: 8px 0;
+    font-size: 14px;
+  }
+
+  .card button {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+
+  .card button.available {
+    background: #ff4081;
+    color: #fff;
+  }
+
+  .card button.available:hover {
+    background: #e73370;
+  }
+
+  .card button.reserved {
+    background: #ccc;
+    cursor: not-allowed;
+    color: #666;
+  }
+
+  .card.reserved::after {
+    content: "Reservado";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.7);
+    color: #ff4081;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    animation: reservedPulse 1.5s infinite;
+  }
+
+  @keyframes reservedPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 0.9; }
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    background: #ffebf0;
+    margin-top: 40px;
+    font-size: 14px;
+    color: #555;
+  }
+
+  /* Modal QR Code */
+  #qrModal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: rgba(0,0,0,0.6);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  #qrModal.show {
+    opacity: 1;
+  }
+
+  #qrModalContent {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 15px;
+    text-align: center;
+    position: relative;
+    max-width: 320px;
+  }
+
+  #qrModalContent h3 {
+    color: #ff4081;
+  }
+
+  #qrModalContent button {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    background: #ff4081;
+    color: #fff;
+  }
+
+  #closeModal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #ff4081;
+  }
+
+  @media (max-width: 600px) {
+    #cards {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card {
+      width: 90%;
+    }
+  }
+
+  .confetti {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    animation-name: confettiFall;
+    animation-timing-function: linear;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-10px) rotate(0deg); }
+    100% { transform: translateY(100vh) rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Arthur & Estephani</h1>
+  <p>Nosso casamento: 22 de maio de 2026</p>
+  <button id="copyHeaderCode">Copiar QR Code</button>
+</header>
+
+<h2>Escolha um presente</h2>
+<div id="cards"></div>
+
+<footer>
+  Feito com ❤️ para o nosso grande dia!
+</footer>
+
+<!-- Modal QR Code -->
+<div id="qrModal">
+  <div id="qrModalContent">
+    <span id="closeModal">&times;</span>
+    <h3>Presente escolhido!</h3>
+    <p><strong>Valor:</strong> <span id="giftValue"></span></p>
+    <p><strong>QR Code/Chave:</strong></p>
+    <input type="text" id="giftCode" readonly style="width:100%; text-align:center; font-weight:bold; margin-top:5px;"/>
+    <button onclick="copyCode()">Copiar Código</button>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbz7Td16fhgaj2R4tViJbxe8OK8cwMb8A749iWF8EWCI2bIwCYev3JpZzi0jAHUJUXlfwQ/exec";
+const fixedCode = "11512cfd-170e-4527-b96b-a7e674a5009b";
+let confettiInterval;
+
+// Botão copiar QR header
+document.getElementById("copyHeaderCode").onclick = function() {
+  navigator.clipboard.writeText(fixedCode)
+    .then(() => alert("Código QR copiado!"))
+    .catch(() => alert("Não foi possível copiar, tente novamente."));
+};
+
+// Carregar presentes
+async function loadPresents() {
+  const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "get"}) });
+  const presents = await res.json();
+  const container = document.getElementById("cards");
+  container.innerHTML = "";
+
+  presents.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const isAvailable = p.status.toLowerCase() === "disponível";
+
+    if(!isAvailable) card.classList.add('reserved');
+
+    const imagePath = `imagens/${p.id}.png`;
+
+    card.innerHTML = `
+      <img src="${imagePath}" alt="${p.nome}" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<h3 style=\\'color:#ff4081;\\'>Sem foto</h3>')">
+      <h3>${p.nome}</h3>
+      <p>${p.descricao}</p>
+      <p><strong>Valor:</strong> R$ ${p.valor}</p>
+      <p><strong>Status:</strong> ${p.status}</p>
+      ${!isAvailable && p.comprador ? `<p><strong>Patrocinador:</strong> ${p.comprador}</p>` : ""}
+      <button class="${isAvailable ? 'available' : 'reserved'}" ${isAvailable ? '' : 'disabled'} onclick="chooseGift('${p.id}', '${p.valor}')">
+        ${isAvailable ? "Escolher" : "Reservado"}
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// Confetti contínuo
+function startConfetti() {
+  confettiInterval = setInterval(() => {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    const size = 5 + Math.random()*10;
+    confetti.style.width = size+'px';
+    confetti.style.height = size+'px';
+    confetti.style.backgroundColor = ['#ff4081','#ffcd38','#6bcff6','#8bc34a','#ff6f61'][Math.floor(Math.random()*5)];
+    confetti.style.left = Math.random()*window.innerWidth+'px';
+    confetti.style.animationDuration = (3 + Math.random()*3)+'s';
+    confetti.style.opacity = 0.7 + Math.random()*0.3;
+    document.body.appendChild(confetti);
+    setTimeout(()=>confetti.remove(), 6000);
+  }, 200);
+}
+
+function stopConfetti() {
+  clearInterval(confettiInterval);
+}
+
+// Escolher presente
+async function chooseGift(id, valor) {
+  const comprador = prompt("Digite seu nome para reservar o presente:");
+  if(!comprador) return alert("Nome obrigatório!");
+  const confirmGift = confirm("Você realmente quer dar este presente?");
+  if(!confirmGift) return;
+
+  const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "register", id, comprador}) });
+  const result = await res.json();
+  if(result.success){
+    alert("Presente reservado com sucesso!");
+    document.getElementById("giftValue").innerText = `R$ ${valor}`;
+    document.getElementById("giftCode").value = fixedCode;
+
+    const modal = document.getElementById("qrModal");
+    modal.style.display = "flex";
+    modal.classList.add("show");
+
+    startConfetti();
+    loadPresents();
+  } else {
+    alert("Erro ao reservar o presente, tente novamente.");
+  }
+}
+
+// Copiar código do modal
+function copyCode() {
+  const code = document.getElementById("giftCode");
+  code.select();
+  document.execCommand("copy");
+  alert("Código copiado!");
+}
+
+document.getElementById("giftCode").onclick = copyCode;
+
+// Fechar modal
+document.getElementById("closeModal").onclick = function() {
+  const modal = document.getElementById("qrModal");
+  modal.classList.remove("show");
+  stopConfetti();
+  setTimeout(()=>{ modal.style.display = "none"; }, 300);
+}
+
+loadPresents();
+</script>
+
+</body>
+</html>
