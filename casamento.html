@@ -35,12 +35,11 @@
     color: #555;
   }
 
-  /* Botão copiar QR abaixo do subtítulo */
   #copyHeaderCode {
     display: block;
     margin: 15px auto 0 auto;
-    padding: 10px 20px; /* mais largo e alto */
-    font-size: 16px;
+    padding: 12px 25px;
+    font-size: 18px;
     border-radius: 12px;
     border: none;
     cursor: pointer;
@@ -57,6 +56,7 @@
     text-align: center;
     margin-top: 30px;
     color: #ff4081;
+    font-size: 28px;
   }
 
   #cards {
@@ -92,6 +92,7 @@
   .card h3 {
     margin-top: 0;
     color: #ff4081;
+    font-size: 20px;
   }
 
   .card p {
@@ -117,7 +118,7 @@
   }
 
   .card button.available:hover {
-    background: #e73370;
+    background-color: #e73370;
   }
 
   .card button.reserved {
@@ -154,7 +155,7 @@
     padding: 20px;
     background: #ffebf0;
     margin-top: 40px;
-    font-size: 14px;
+    font-size: 16px;
     color: #555;
   }
 
@@ -190,17 +191,18 @@
 
   #qrModalContent h3 {
     color: #ff4081;
+    font-size: 22px;
   }
 
   #qrModalContent button {
     margin-top: 15px;
-    padding: 10px;
+    padding: 12px;
     width: 100%;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 18px;
     background: #ff4081;
     color: #fff;
   }
@@ -209,19 +211,63 @@
     position: absolute;
     top: 10px;
     right: 15px;
-    font-size: 20px;
+    font-size: 22px;
     cursor: pointer;
     color: #ff4081;
   }
 
-  @media (max-width: 600px) {
+  /* Mobile médio: duas colunas */
+  @media (max-width: 800px) {
     #cards {
-      flex-direction: column;
-      align-items: center;
+      gap: 15px;
     }
 
     .card {
-      width: 90%;
+      width: calc(50% - 15px)!important;
+      padding: 25px;
+    }
+
+    .card h3 {
+      font-size: 22px;
+    }
+
+    .card p {
+      font-size: 16px;
+    }
+
+    .card button {
+      font-size: 18px;
+      padding: 12px;
+    }
+  }
+
+  /* Mobile pequeno: uma coluna */
+  @media (max-width: 500px) {
+    #cards {
+      gap: 15px;
+    }
+
+    .card {
+      width: 95%;
+      padding: 25px;
+    }
+
+    .card h3 {
+      font-size: 24px;
+    }
+
+    .card p {
+      font-size: 18px;
+    }
+
+    .card button {
+      font-size: 20px;
+      padding: 15px;
+    }
+
+    #copyHeaderCode {
+      font-size: 18px;
+      padding: 12px 25px;
     }
   }
 
@@ -295,8 +341,8 @@ async function loadPresents() {
     const imagePath = `https://raw.githubusercontent.com/creatixofc/menalmei/main/Imagens/${p.id}.png`;
 
     card.innerHTML = `
-      <img src="${imagePath}" alt="${p.id}" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<h3 style=\\'color:#ff4081;\\'>Sem foto</h3>')">
-      <h3>${p.id}</h3>
+      <img src="${imagePath}" alt="${p.nome}" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<h3 style=\\'color:#ff4081;\\'>Sem foto</h3>')">
+      <h3>${p.nome}</h3>
       <p>${p.descricao}</p>
       <p><strong>Valor:</strong> R$ ${p.valor}</p>
       <p><strong>Status:</strong> ${p.status}</p>
@@ -378,10 +424,3 @@ loadPresents();
 
 </body>
 </html>
-
-
-
-
-
-
-
