@@ -1,116 +1,184 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Últimas Vendas - Menalmei</title>
-  <style>
-    /* ===== RESET E BASE ===== */
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #232938;
-      margin: 0;
-      padding: 20px;
-      color: #fff;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 40px;
-      font-size: 32px;
-      color: #fff;
-      letter-spacing: 1px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Últimas Vendas - Menalmei</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif';
+    margin:0; padding:0;
+    background-color:#232938;
+    color:#fff;
+    overflow-x:hidden;
+    position:relative;
+  }
 
-    /* ===== CONTAINER ===== */
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 25px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+  h1 {
+    text-align:center;
+    font-size:32px;
+    letter-spacing:1px;
+    margin:0;
+    position:relative;
+    z-index:2;
+  }
 
-    /* ===== CARD ===== */
-    .card {
-      background: linear-gradient(145deg, #000000, #232938);
-      border-radius: 15px;
-      padding: 20px 25px;
-      width: 340px;
-      height: 160px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      border-left: 5px solid #fff;
-    }
+  .stats {
+    text-align:center;
+    margin:10px 0 30px 0;
+    font-size:18px;
+    color:#ccc;
+    position:relative;
+    z-index:2;
+  }
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.7);
-    }
+  .container {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+    max-width:1200px;
+    margin:0 auto 50px auto;
+    position:relative;
+    z-index:2;
+  }
 
-    /* ===== TEXTO ===== */
-    .pedido {
-      font-weight: 700;
-      font-size: 20px;
-      color: #fff;
-    }
-    .vendedor {
-      font-size: 16px;
-      color: #ccc;
-    }
-    .valor {
-      font-size: 18px;
-      font-weight: bold;
-      color: #fff;
-      background: #000;
-      padding: 4px 8px;
-      border-radius: 6px;
-      align-self: flex-start;
-    }
-    .data, .hora {
-      font-size: 14px;
-      color: #aaa;
-    }
-  </style>
+  .card {
+    border-radius:15px;
+    padding:20px;
+    width:320px;
+    height:160px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.5);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-around;
+    border-left:5px solid #fff;
+    box-sizing:border-box;
+    position:relative;
+  }
+
+  .pedido{ font-weight:700; font-size:20px; color:#fff; }
+  .vendedor{ font-size:16px; color:#ccc; }
+  .valor{ font-size:18px; font-weight:bold; color:#fff; background:#000; padding:4px 8px; border-radius:6px; align-self:flex-start; display:inline-flex; align-items:center; gap:4px; }
+  .data, .hora{ font-size:14px; color:#aaa; display:flex; align-items:center; gap:4px; }
+
+  @media (max-width:700px){ .card{ width:90%; } }
+
+  canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:1;
+    pointer-events:none;
+  }
+
+  .titulo-container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:120px;
+    position:relative;
+    z-index:2;
+  }
+
+</style>
 </head>
 <body>
+
+<div class="titulo-container">
   <h1>📦 Últimas Vendas - Menalmei</h1>
-  <div class="container" id="vendasContainer"></div>
+</div>
+<div class="stats" id="stats">Carregando estatísticas...</div>
+<div class="container" id="vendasContainer"></div>
 
-  <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbzJzSki4Brw4i_Xo-7r38N0JNYnYqom3lu8Lo4mJlZXwdH07pDMwqMhEVnqggMQ_Ic7MQ/exec";
+<canvas id="bgCanvas"></canvas>
+<audio id="novoSom" src="https://proxy.notificationsounds.com/free-jingles-and-logos/light-hearted-message-tone/download/file-sounds-1351-light-hearted.mp3" preload="auto"></audio>
 
-    async function carregarVendas() {
-      try {
-        const resposta = await fetch(apiUrl);
-        const dados = await resposta.json();
+<script>
+const apiUrl = "https://script.google.com/macros/s/AKfycbzuEhcAqYbbauRwqZOJH43wQndkhwWYQ_RDFXDpAqE2CeQhtRxDp6q6GRfJtYm7E_TJWw/exec";
+let pedidosExistentes = new Set();
+let somDesbloqueado = false;
 
-        const container = document.getElementById("vendasContainer");
-        container.innerHTML = ""; // limpa os cards antigos
+// Permite som após interação do usuário
+document.body.addEventListener('click', () => { somDesbloqueado = true; }, { once: true });
 
-        dados.forEach(venda => {
-          const card = document.createElement("div");
-          card.classList.add("card");
-          card.innerHTML = `
-            <div class="pedido">Pedido Nº ${venda.Pedido}</div>
-            <div class="vendedor">👤 ${venda.Vendedor}</div>
-            <div class="valor">R$ ${venda.Valor}</div>
-            <div class="data">🗓️ ${venda.Data}</div>
-            <div class="hora">⏰ ${venda.Hora}</div>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        console.error("Erro ao carregar vendas:", err);
+// ======== FUNÇÃO PARA CARREGAR VENDAS ========
+async function carregarVendas() {
+  try {
+    const urlAtual = apiUrl + "?t=" + new Date().getTime();
+    const resposta = await fetch(urlAtual, { cache:"no-store" });
+    const dados = await resposta.json();
+    const container = document.getElementById("vendasContainer");
+
+    // Estatísticas
+    const totalVendas = dados.length;
+    const totalValor = dados.reduce((acc,v)=>acc+parseFloat(v.Valor.replace(",", ".")),0);
+    const ticketMedio = totalVendas ? (totalValor/totalVendas):0;
+    document.getElementById("stats").innerText = `💵 Total: R$ ${totalValor.toFixed(2)} | Pedidos: ${totalVendas} | Ticket Médio: R$ ${ticketMedio.toFixed(2)}`;
+
+    // Ordena pelo maior número de pedido (mais recente primeiro)
+    const dadosOrdenados = dados.sort((a,b)=>parseInt(b.Pedido)-parseInt(a.Pedido));
+
+    // Limpa o container
+    container.innerHTML = "";
+
+    for(let venda of dadosOrdenados){
+      const card = document.createElement("div");
+      card.classList.add("card");
+      card.setAttribute("data-pedido", venda.Pedido);
+      card.innerHTML = `
+        <div class="pedido">Pedido Nº ${venda.Pedido}</div>
+        <div class="vendedor">👤 ${venda.Vendedor}</div>
+        <div class="valor">💰 R$ ${parseFloat(venda.Valor).toFixed(2)}</div>
+        <div class="data">🗓️ ${venda.Data}</div>
+        <div class="hora">⏰ ${venda.Hora}</div>
+      `;
+      container.appendChild(card);
+
+      // Som apenas se for novo pedido e som desbloqueado
+      if(!pedidosExistentes.has(venda.Pedido) && somDesbloqueado){
+        try { document.getElementById("novoSom").play(); } catch(e){ console.log("Som bloqueado"); }
+        pedidosExistentes.add(venda.Pedido);
       }
     }
 
-    // Atualiza imediatamente e depois a cada 5 segundos
-    carregarVendas();
-    setInterval(carregarVendas, 5000);
-  </script>
+  } catch(err){
+    console.error("Erro ao carregar vendas:",err);
+  }
+}
+
+carregarVendas();
+setInterval(carregarVendas,5000);
+
+// ======== FUNDO ANIMADO ========
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+for(let i=0;i<60;i++){
+  particles.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*2+1, dx:(Math.random()-0.5)*0.5, dy:(Math.random()-0.5)*0.5 });
+}
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "rgba(255,255,255,0.2)";
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
+    p.x+=p.dx;
+    p.y+=p.dy;
+    if(p.x<0)p.x=canvas.width;
+    if(p.x>canvas.width)p.x=0;
+    if(p.y<0)p.y=canvas.height;
+    if(p.y>canvas.height)p.y=0;
+  });
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
 </body>
 </html>
