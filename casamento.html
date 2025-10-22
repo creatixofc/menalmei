@@ -295,7 +295,7 @@ async function loadPresents() {
     const imagePath = `imagens/${p.id}.png`;
 
     card.innerHTML = `
-      <img src="${imagePath}" alt="${p.nome}" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<h3 style=\\'color:#ff4081;\\'>Sem foto</h3>')">
+      <img src="${imagePath}" alt="${p.nome}"; this.insertAdjacentHTML('afterend','<h3 style=\\'color:#ff4081;\\'>Sem foto</h3>')">
       <h3>${p.nome}</h3>
       <p>${p.descricao}</p>
       <p><strong>Valor:</strong> R$ ${p.valor}</p>
@@ -378,3 +378,4 @@ loadPresents();
 
 </body>
 </html>
+
